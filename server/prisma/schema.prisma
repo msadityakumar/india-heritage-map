@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Monument {
+  id          String @id
+  name        String
+  lat         Float
+  lng         Float
+  state       String
+  dynasty     String
+  era         String
+  description String
+
+  @@map("monuments")
+}
