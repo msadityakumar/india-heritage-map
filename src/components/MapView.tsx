@@ -1,6 +1,9 @@
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import type { Monument } from "../data/monuments";
 
 // Default Leaflet marker icons reference image files in a way that breaks
@@ -23,6 +26,31 @@ function MapController({ target }: { target: Monument | null }) {
   return null;
 }
 
+function ClusterLayer({
+  monuments,
+  onSelect,
+}: {
+  monuments: Monument[];
+  onSelect: (m: Monument) => void;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    const group = L.markerClusterGroup({ maxClusterRadius: 60, spiderfyOnMaxZoom: true });
+
+    monuments.forEach((m) => {
+      L.marker([m.lat, m.lng], { icon: pinIcon })
+        .on("click", () => onSelect(m))
+        .addTo(group);
+    });
+
+    map.addLayer(group);
+    return () => { map.removeLayer(group); };
+  }, [monuments, onSelect, map]);
+
+  return null;
+}
+
 interface MapViewProps {
   monuments: Monument[];
   onSelect: (monument: Monument) => void;
@@ -32,7 +60,7 @@ interface MapViewProps {
 export default function MapView({ monuments, onSelect, flyTarget }: MapViewProps) {
   return (
     <MapContainer
-      center={[22.5, 79]} // roughly the geographic center of India
+      center={[22.5, 79]}
       zoom={5}
       minZoom={4}
       className="map-container"
@@ -44,14 +72,7 @@ export default function MapView({ monuments, onSelect, flyTarget }: MapViewProps
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapController target={flyTarget} />
-      {monuments.map((m) => (
-        <Marker
-          key={m.id}
-          position={[m.lat, m.lng]}
-          icon={pinIcon}
-          eventHandlers={{ click: () => onSelect(m) }}
-        />
-      ))}
+      <ClusterLayer monuments={monuments} onSelect={onSelect} />
     </MapContainer>
   );
 }
