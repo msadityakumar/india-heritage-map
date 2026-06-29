@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { Monument } from "../data/monuments";
 
@@ -12,12 +13,23 @@ const pinIcon = L.divIcon({
   iconAnchor: [8, 8],
 });
 
+function MapController({ target }: { target: Monument | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) {
+      map.flyTo([target.lat, target.lng], Math.max(map.getZoom(), 8), { duration: 1.2 });
+    }
+  }, [target, map]);
+  return null;
+}
+
 interface MapViewProps {
   monuments: Monument[];
   onSelect: (monument: Monument) => void;
+  flyTarget: Monument | null;
 }
 
-export default function MapView({ monuments, onSelect }: MapViewProps) {
+export default function MapView({ monuments, onSelect, flyTarget }: MapViewProps) {
   return (
     <MapContainer
       center={[22.5, 79]} // roughly the geographic center of India
@@ -31,6 +43,7 @@ export default function MapView({ monuments, onSelect }: MapViewProps) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <MapController target={flyTarget} />
       {monuments.map((m) => (
         <Marker
           key={m.id}
