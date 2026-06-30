@@ -7,6 +7,7 @@
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
     "seed": "tsx prisma/seed.ts",
+    "download-images": "tsx prisma/download-images.ts",
     "db:push": "prisma db push"
   },
   "dependencies": {
