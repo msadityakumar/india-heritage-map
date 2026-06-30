@@ -16,6 +16,7 @@ model Monument {
   dynasty     String
   era         String
   description String
+  imageUrl    String?
 
   @@map("monuments")
 }

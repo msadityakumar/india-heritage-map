@@ -7,4 +7,5 @@ export interface Monument {
   dynasty: string;
   era: string;
   description: string;
+  imageUrl: string | null;
 }
